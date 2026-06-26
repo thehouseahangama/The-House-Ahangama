@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE HOUSE — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1a1a;
+  --surface: #162424;
+  --card: #1d2f2f;
+  --border: rgba(255,255,255,0.07);
+  --gold: #c9a84c;
+  --teal: #2d9e9e;
+  --coral: #d4735e;
+  --green: #4caf7d;
+  --text: #e8e0d0;
+  --muted: #7a9090;
+  --sand: #f5efe6;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  font-family: 'Jost', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ── LOGIN ── */
+#loginScreen {
+  position: fixed; inset: 0; z-index: 1000;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+}
+.login-box {
+  background: var(--surface);
+  padding: 3rem; width: 100%; max-width: 380px;
+  border: 1px solid var(--border);
+}
+.login-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem; font-weight: 300; letter-spacing: 0.3em;
+  color: white; text-align: center; margin-bottom: 0.3rem;
+}
+.login-logo span { color: var(--gold); }
+.login-sub { text-align: center; font-size: 0.7rem; letter-spacing: 0.25em; color: var(--muted); margin-bottom: 2.5rem; text-transform: uppercase; }
+.login-field { margin-bottom: 1rem; }
+.login-field label { display: block; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.4rem; }
+.login-field input {
+  width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+  color: var(--text); padding: 0.75rem 1rem; font-family: 'Jost', sans-serif; font-size: 0.9rem;
+  outline: none; transition: border-color 0.2s;
+}
+.login-field input:focus { border-color: var(--gold); }
+.login-btn {
+  width: 100%; background: var(--gold); color: white; border: none; cursor: pointer;
+  padding: 0.9rem; font-family: 'Jost', sans-serif; font-size: 0.78rem;
+  letter-spacing: 0.2em; text-transform: uppercase; margin-top: 0.5rem;
+  transition: opacity 0.2s;
+}
+.login-btn:hover { opacity: 0.85; }
+.login-err { color: var(--coral); font-size: 0.75rem; margin-top: 0.7rem; text-align: center; display: none; }
+
+/* ── LAYOUT ── */
+#appShell { display: flex; width: 100%; min-height: 100vh; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 230px; min-height: 100vh; background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  flex-shrink: 0;
+}
+.sb-logo {
+  padding: 1.8rem 1.5rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.sb-logo-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem; font-weight: 300; letter-spacing: 0.25em; color: white;
+}
+.sb-logo-text span { color: var(--gold); }
+.sb-sub { font-size: 0.6rem; color: var(--muted); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 0.2rem; }
+.sb-nav { padding: 1.5rem 0; flex: 1; }
+.sb-section { padding: 0.4rem 1.5rem; font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.3rem; }
+.sb-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.7rem 1.5rem; cursor: pointer;
+  font-size: 0.82rem; color: var(--muted);
+  transition: all 0.15s; border-left: 2px solid transparent;
+  text-decoration: none;
+}
+.sb-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+.sb-item.active { color: var(--gold); border-left-color: var(--gold); background: rgba(201,168,76,0.07); }
+.sb-item .icon { font-size: 1rem; width: 20px; text-align: center; }
+.sb-footer {
+  padding: 1.5rem; border-top: 1px solid var(--border);
+  font-size: 0.72rem; color: var(--muted);
+}
+.sb-logout {
+  display: flex; align-items: center; gap: 0.5rem;
+  cursor: pointer; transition: color 0.15s; margin-top: 0.5rem;
+}
+.sb-logout:hover { color: var(--coral); }
+.sb-wa-btn {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: #25D366; color: white;
+  padding: 0.5rem 1rem; font-size: 0.65rem;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  text-decoration: none; margin-top: 0.5rem; transition: opacity 0.2s;
+}
+.sb-wa-btn:hover { opacity: 0.85; }
+
+/* ── MAIN ── */
+.main { flex: 1; padding: 2rem; overflow-x: auto; }
+.page { display: none; }
+.page.active { display: block; }
+.page-header { margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+.page-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem; font-weight: 300; color: white;
+}
+.page-title em { font-style: italic; color: var(--gold); }
+.btn-add {
+  background: var(--gold); color: white; border: none; cursor: pointer;
+  padding: 0.6rem 1.4rem; font-family: 'Jost', sans-serif; font-size: 0.72rem;
+  letter-spacing: 0.18em; text-transform: uppercase; transition: opacity 0.2s;
+}
+.btn-add:hover { opacity: 0.85; }
+.btn-teal {
+  background: var(--teal); color: white; border: none; cursor: pointer;
+  padding: 0.6rem 1.4rem; font-family: 'Jost', sans-serif; font-size: 0.72rem;
+  letter-spacing: 0.18em; text-transform: uppercase; transition: opacity 0.2s;
+}
+
+/* ── STAT CARDS ── */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 1rem; margin-bottom: 2rem; }
+.stat-card {
+  background: var(--card); padding: 1.4rem; border: 1px solid var(--border);
+}
+.stat-label { font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+.stat-val { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; color: white; line-height: 1; }
+.stat-sub { font-size: 0.7rem; color: var(--muted); margin-top: 0.3rem; }
+.stat-up { color: var(--green); }
+.stat-down { color: var(--coral); }
+
+/* ── TABLE ── */
+.table-wrap { background: var(--card); border: 1px solid var(--border); overflow-x: auto; }
+.tbl-head { padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.8rem; }
+.tbl-head h3 { font-size: 0.85rem; letter-spacing: 0.12em; font-weight: 400; }
+.tbl-search {
+  background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+  color: var(--text); padding: 0.45rem 0.9rem; font-family: 'Jost', sans-serif;
+  font-size: 0.8rem; outline: none; width: 200px;
+}
+.tbl-search:focus { border-color: var(--gold); }
+table { width: 100%; border-collapse: collapse; min-width: 600px; }
+thead tr { border-bottom: 1px solid var(--border); }
+th { padding: 0.75rem 1.5rem; text-align: left; font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--muted); font-weight: 400; }
+td { padding: 0.9rem 1.5rem; font-size: 0.82rem; border-bottom: 1px solid var(--border); }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* ── BADGES ── */
+.badge {
+  display: inline-block; padding: 0.2rem 0.6rem;
+  font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; border-radius: 0;
+}
+.badge-confirmed { background: rgba(76,175,125,0.15); color: var(--green); border: 1px solid rgba(76,175,125,0.3); }
+.badge-pending { background: rgba(201,168,76,0.15); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
+.badge-cancelled { background: rgba(212,115,94,0.15); color: var(--coral); border: 1px solid rgba(212,115,94,0.3); }
+.badge-checkedin { background: rgba(45,158,158,0.15); color: var(--teal); border: 1px solid rgba(45,158,158,0.3); }
+
+/* ── ACTION BTNS ── */
+.act-btns { display: flex; gap: 0.5rem; }
+.act-btn {
+  background: none; border: 1px solid var(--border); color: var(--muted);
+  padding: 0.3rem 0.65rem; font-size: 0.65rem; cursor: pointer; letter-spacing: 0.1em;
+  transition: all 0.15s; font-family: 'Jost', sans-serif;
+}
+.act-btn:hover { border-color: var(--gold); color: var(--gold); }
+.act-btn.wa:hover { border-color: #25D366; color: #25D366; }
+.act-btn.del:hover { border-color: var(--coral); color: var(--coral); }
+
+/* ── FORM PANEL ── */
+.form-panel {
+  display: none; background: var(--card); border: 1px solid var(--border);
+  padding: 2rem; margin-bottom: 2rem;
+}
+.form-panel.open { display: block; }
+.form-panel h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; margin-bottom: 1.5rem; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 1rem; }
+.form-field { display: flex; flex-direction: column; gap: 0.35rem; }
+.form-field label { font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); }
+.form-field input, .form-field select, .form-field textarea {
+  background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+  color: var(--text); padding: 0.65rem 0.9rem; font-family: 'Jost', sans-serif;
+  font-size: 0.85rem; outline: none; transition: border-color 0.2s;
+}
+.form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--gold); }
+.form-field select option { background: var(--surface); }
+.form-field.full { grid-column: 1 / -1; }
+.form-actions { display: flex; gap: 0.8rem; margin-top: 1.5rem; }
+.form-save {
+  background: var(--gold); color: white; border: none; cursor: pointer;
+  padding: 0.65rem 1.8rem; font-family: 'Jost', sans-serif; font-size: 0.72rem;
+  letter-spacing: 0.18em; text-transform: uppercase;
+}
+.form-cancel {
+  background: none; color: var(--muted); border: 1px solid var(--border); cursor: pointer;
+  padding: 0.65rem 1.4rem; font-family: 'Jost', sans-serif; font-size: 0.72rem;
+  letter-spacing: 0.18em; text-transform: uppercase; transition: all 0.2s;
+}
+.form-cancel:hover { border-color: var(--coral); color: var(--coral); }
+
+/* ── CALENDAR ── */
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 1rem; }
+.cal-day-name { text-align: center; font-size: 0.6rem; letter-spacing: 0.2em; color: var(--muted); padding: 0.5rem 0; }
+.cal-day {
+  background: var(--card); border: 1px solid var(--border); min-height: 70px;
+  padding: 0.4rem; font-size: 0.7rem; color: var(--muted); cursor: pointer;
+  transition: border-color 0.2s; position: relative;
+}
+.cal-day:hover { border-color: var(--gold); }
+.cal-day.today { border-color: var(--teal); }
+.cal-day.has-booking { background: rgba(201,168,76,0.08); }
+.cal-day .day-num { font-size: 0.75rem; color: var(--text); margin-bottom: 0.3rem; }
+.cal-event {
+  background: rgba(201,168,76,0.25); font-size: 0.55rem; padding: 1px 4px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  color: var(--gold); margin-bottom: 2px; border-left: 2px solid var(--gold);
+}
+.cal-event.checkin { border-left-color: var(--green); color: var(--green); background: rgba(76,175,125,0.15); }
+.cal-event.checkout { border-left-color: var(--coral); color: var(--coral); background: rgba(212,115,94,0.15); }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;
+  background: var(--green); color: white; padding: 0.8rem 1.5rem;
+  font-size: 0.8rem; letter-spacing: 0.1em; display: none;
+  animation: none;
+}
+.toast.show { display: block; animation: toastIn 0.3s; }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div style="text-align:center;margin-bottom:0.3rem;">
+      <img src="thehouselogo.png" alt="The House" style="height:90px;width:auto;filter:brightness(0) invert(1);opacity:0.9;">
+    </div>
+    <div class="login-sub">Admin Panel</div>
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="l-user" placeholder="admin" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="loginErr">Incorrect credentials. Try admin / thehouse2024</div>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="appShell" style="display:none;">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo" style="padding:1.2rem 1.5rem;">
+      <img src="thehouselogo.png" alt="The House" style="height:60px;width:auto;filter:brightness(0) invert(1);opacity:0.85;">
+      <div class="sb-sub" style="margin-top:0.5rem;">Admin Panel</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Main</div>
+      <a class="sb-item active" onclick="showPage('dashboard')"><span class="icon">📊</span> Dashboard</a>
+      <a class="sb-item" onclick="showPage('bookings')"><span class="icon">📅</span> Bookings</a>
+      <a class="sb-item" onclick="showPage('calendar')"><span class="icon">🗓</span> Calendar</a>
+      <a class="sb-item" onclick="showPage('guests')"><span class="icon">👥</span> Guests</a>
+      <div class="sb-section">Properties & Services</div>
+      <a class="sb-item" onclick="showPage('properties')"><span class="icon">🏡</span> Properties</a>
+      <a class="sb-item" onclick="showPage('services')"><span class="icon">🎯</span> Services</a>
+      <div class="sb-section">Communication</div>
+      <a class="sb-item" onclick="showPage('messages')"><span class="icon">💬</span> WhatsApp</a>
+      <a class="sb-item" href="index.html" target="_blank"><span class="icon">🌐</span> View Website</a>
+    </nav>
+    <div class="sb-footer">
+      <a href="https://wa.me/94777608288" target="_blank" class="sb-wa-btn">💬 Open WhatsApp</a>
+      <div class="sb-logout" onclick="doLogout()">🚪 Sign Out</div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <h1 class="page-title">Dashboard <em>Overview</em></h1>
+        <span id="todayDate" style="font-size:0.75rem;color:var(--muted);"></span>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Bookings This Month</div>
+          <div class="stat-val" id="stat-bookings">—</div>
+          <div class="stat-sub stat-up">▲ Updated live</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Active Properties</div>
+          <div class="stat-val" id="stat-props">6</div>
+          <div class="stat-sub">Listed & managed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending Requests</div>
+          <div class="stat-val" id="stat-pending">—</div>
+          <div class="stat-sub stat-down">Needs attention</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Guests</div>
+          <div class="stat-val" id="stat-guests">—</div>
+          <div class="stat-sub">Registered guests</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Occupancy Rate</div>
+          <div class="stat-val" id="stat-occ">—%</div>
+          <div class="stat-sub">This month</div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <div class="tbl-head"><h3>Recent Bookings</h3><a href="#" onclick="showPage('bookings')" style="font-size:0.72rem;color:var(--gold);text-decoration:none;">View All →</a></div>
+        <table id="recentTable">
+          <thead><tr><th>Guest</th><th>Property</th><th>Check-In</th><th>Check-Out</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="recentBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BOOKINGS -->
+    <div class="page" id="page-bookings">
+      <div class="page-header">
+        <h1 class="page-title">All <em>Bookings</em></h1>
+        <div style="display:flex;gap:0.7rem;flex-wrap:wrap;">
+          <button class="btn-teal" onclick="exportBookings()">⬇ Export</button>
+          <button class="btn-add" onclick="toggleForm('bookingForm')">+ New Booking</button>
+        </div>
+      </div>
+
+      <div class="form-panel" id="bookingForm">
+        <h3>Add New Booking</h3>
+        <div class="form-grid">
+          <div class="form-field"><label>Guest Name</label><input type="text" id="f-gname" placeholder="Full name"></div>
+          <div class="form-field"><label>WhatsApp Number</label><input type="tel" id="f-gphone" placeholder="+xx xxx xxx xxxx"></div>
+          <div class="form-field"><label>Email</label><input type="email" id="f-gemail" placeholder="guest@email.com"></div>
+          <div class="form-field"><label>Nationality</label><input type="text" id="f-gnat" placeholder="Country"></div>
+          <div class="form-field"><label>Property</label>
+            <select id="f-prop"></select>
+          </div>
+          <div class="form-field"><label>Source</label>
+            <select id="f-source">
+              <option>Direct (WhatsApp)</option><option>Direct (Email)</option>
+              <option>Airbnb</option><option>Booking.com</option>
+              <option>Agoda</option><option>Walk-in</option>
+            </select>
+          </div>
+          <div class="form-field"><label>Check-In</label><input type="date" id="f-in"></div>
+          <div class="form-field"><label>Check-Out</label><input type="date" id="f-out"></div>
+          <div class="form-field"><label>Guests</label><input type="number" id="f-guests" min="1" max="20" value="2"></div>
+          <div class="form-field"><label>Total Price (USD)</label><input type="number" id="f-price" placeholder="e.g. 350"></div>
+          <div class="form-field"><label>Status</label>
+            <select id="f-status">
+              <option>Pending</option><option>Confirmed</option>
+              <option>Checked-In</option><option>Checked-Out</option><option>Cancelled</option>
+            </select>
+          </div>
+          <div class="form-field"><label>Payment Status</label>
+            <select id="f-payment">
+              <option>Unpaid</option><option>Deposit Paid</option><option>Fully Paid</option>
+            </select>
+          </div>
+          <div class="form-field full"><label>Notes</label><textarea id="f-notes" rows="3" placeholder="Special requests, notes..."></textarea></div>
+        </div>
+        <div class="form-actions">
+          <button class="form-save" onclick="saveBooking()">Save Booking</button>
+          <button class="form-cancel" onclick="toggleForm('bookingForm')">Cancel</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <div class="tbl-head">
+          <h3>Reservation List</h3>
+          <input class="tbl-search" id="bk-search" placeholder="Search bookings..." oninput="filterBookings()">
+        </div>
+        <table>
+          <thead><tr><th>#</th><th>Guest</th><th>Property</th><th>Check-In</th><th>Check-Out</th><th>Guests</th><th>Price</th><th>Source</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="bookingsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="page" id="page-calendar">
+      <div class="page-header">
+        <h1 class="page-title">Availability <em>Calendar</em></h1>
+        <div style="display:flex;gap:0.7rem;align-items:center;">
+          <button class="act-btn" onclick="prevMonth()">← Prev</button>
+          <span id="calMonthLabel" style="font-size:0.85rem;letter-spacing:0.1em;min-width:120px;text-align:center;"></span>
+          <button class="act-btn" onclick="nextMonth()">Next →</button>
+        </div>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+
+    <!-- GUESTS -->
+    <div class="page" id="page-guests">
+      <div class="page-header">
+        <h1 class="page-title">Guest <em>Registry</em></h1>
+      </div>
+      <div class="table-wrap">
+        <div class="tbl-head"><h3>All Guests</h3>
+          <input class="tbl-search" id="gs-search" placeholder="Search guests..." oninput="filterGuests()">
+        </div>
+        <table>
+          <thead><tr><th>Guest</th><th>Phone</th><th>Email</th><th>Nationality</th><th>Bookings</th><th>Total Spent</th><th>Actions</th></tr></thead>
+          <tbody id="guestsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PROPERTIES -->
+    <div class="page" id="page-properties">
+      <div class="page-header">
+        <h1 class="page-title">Manage <em>Properties</em></h1>
+        <div style="display:flex;gap:0.7rem;flex-wrap:wrap;">
+          <button class="btn-teal" onclick="previewSite()">🌐 Preview Website</button>
+          <button class="btn-add" onclick="openPropForm()">+ Add Property</button>
+        </div>
+      </div>
+
+      <!-- ADD / EDIT FORM -->
+      <div class="form-panel" id="propForm">
+        <h3 id="propFormTitle">Add New Property</h3>
+        <input type="hidden" id="pf-id">
+        <div class="form-grid">
+          <div class="form-field">
+            <label>Property Name *</label>
+            <input type="text" id="pf-name" placeholder="e.g. The Sunset Villa">
+          </div>
+          <div class="form-field">
+            <label>Location</label>
+            <input type="text" id="pf-loc" placeholder="Ahangama, Sri Lanka" value="Ahangama, Sri Lanka">
+          </div>
+          <div class="form-field">
+            <label>Badge Label</label>
+            <input type="text" id="pf-badge" placeholder="e.g. Popular, Sea View, Luxury">
+          </div>
+          <div class="form-field">
+            <label>Status</label>
+            <select id="pf-status">
+              <option value="Active">Active — show on website</option>
+              <option value="Inactive">Inactive — hide from website</option>
+              <option value="Maintenance">Maintenance — hide from website</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Max Guests</label>
+            <input type="number" id="pf-guests" min="1" max="30" value="4">
+          </div>
+          <div class="form-field">
+            <label>Bedrooms</label>
+            <input type="number" id="pf-beds" min="1" max="20" value="2">
+          </div>
+          <div class="form-field">
+            <label>Bathrooms</label>
+            <input type="number" id="pf-baths" min="1" max="20" value="1">
+          </div>
+          <div class="form-field">
+            <label>Price per Night (USD) *</label>
+            <input type="number" id="pf-price" placeholder="e.g. 120" min="0">
+          </div>
+          <div class="form-field">
+            <label>Card Background Color</label>
+            <input type="color" id="pf-color" value="#1a4040" style="height:38px;cursor:pointer;">
+          </div>
+          <div class="form-field">
+            <label>Photo URL <span style="color:var(--muted);font-size:0.6rem;">(paste image link)</span></label>
+            <input type="url" id="pf-imgurl" placeholder="https://example.com/photo.jpg" oninput="previewImg(this.value)">
+          </div>
+          <div class="form-field">
+            <label>Airbnb Listing URL</label>
+            <input type="url" id="pf-airbnb" placeholder="https://airbnb.com/rooms/...">
+          </div>
+          <div class="form-field">
+            <label>Booking.com URL</label>
+            <input type="url" id="pf-bkcom" placeholder="https://booking.com/hotel/...">
+          </div>
+          <div class="form-field full">
+            <label>Short Description * <span style="color:var(--muted);font-size:0.6rem;">(shown on website card)</span></label>
+            <textarea id="pf-desc" rows="2" placeholder="A short enticing description of the property..."></textarea>
+          </div>
+          <div class="form-field full">
+            <label>Full Description <span style="color:var(--muted);font-size:0.6rem;">(optional, for detail page)</span></label>
+            <textarea id="pf-fulldesc" rows="3" placeholder="More details about amenities, highlights, what makes it special..."></textarea>
+          </div>
+        </div>
+        <!-- Image preview -->
+        <div id="imgPreviewWrap" style="display:none;margin-top:1rem;">
+          <div style="font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem;">Image Preview</div>
+          <img id="imgPreview" style="max-height:160px;border:1px solid var(--border);object-fit:cover;" alt="Preview">
+        </div>
+        <div class="form-actions">
+          <button class="form-save" onclick="saveProp()">💾 Save Property</button>
+          <button class="form-cancel" onclick="closePropForm()">Cancel</button>
+        </div>
+      </div>
+
+      <!-- PROPERTIES TABLE -->
+      <div class="table-wrap">
+        <div class="tbl-head">
+          <h3 id="propCount">All Properties</h3>
+          <div style="font-size:0.72rem;color:var(--muted);">✅ Active properties show on the public website automatically</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Preview</th>
+              <th>Name</th>
+              <th>Details</th>
+              <th>Price/Night</th>
+              <th>Platforms</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="propsBody"></tbody>
+        </table>
+      </div>
+
+      <!-- LIVE PREVIEW NOTE -->
+      <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);padding:1.2rem 1.5rem;margin-top:1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+        <span style="font-size:1.4rem;">💡</span>
+        <div>
+          <div style="font-size:0.78rem;color:var(--gold);letter-spacing:0.1em;margin-bottom:0.2rem;">Live Sync</div>
+          <div style="font-size:0.78rem;color:var(--muted);line-height:1.6;">Changes saved here instantly appear on the public website when visitors reload the page. Add a photo URL to show a real property image instead of a colour card.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERVICES -->
+    <div class="page" id="page-services">
+      <div class="page-header">
+        <h1 class="page-title">Service <em>Requests</em></h1>
+        <button class="btn-add" onclick="toggleForm('svcReqForm')">+ Log Request</button>
+      </div>
+      <div class="form-panel" id="svcReqForm">
+        <h3>Log Service Request</h3>
+        <div class="form-grid">
+          <div class="form-field"><label>Guest Name</label><input type="text" id="sr-name"></div>
+          <div class="form-field"><label>Phone</label><input type="tel" id="sr-phone"></div>
+          <div class="form-field"><label>Service Type</label>
+            <select id="sr-type">
+              <option>Taxi Service</option><option>Surf Lessons</option>
+              <option>Island Tour</option><option>Adventure Sports</option>
+              <option>Restaurant Reservation</option><option>Concierge</option>
+            </select>
+          </div>
+          <div class="form-field"><label>Date</label><input type="date" id="sr-date"></div>
+          <div class="form-field"><label>People</label><input type="number" id="sr-people" value="2"></div>
+          <div class="form-field"><label>Status</label>
+            <select id="sr-status"><option>Pending</option><option>Confirmed</option><option>Completed</option><option>Cancelled</option></select>
+          </div>
+          <div class="form-field full"><label>Details</label><textarea id="sr-notes" rows="2"></textarea></div>
+        </div>
+        <div class="form-actions">
+          <button class="form-save" onclick="saveSvcReq()">Save</button>
+          <button class="form-cancel" onclick="toggleForm('svcReqForm')">Cancel</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Guest</th><th>Phone</th><th>Service</th><th>Date</th><th>People</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="svcBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="page" id="page-messages">
+      <div class="page-header">
+        <h1 class="page-title">WhatsApp <em>Messages</em></h1>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem;">
+        <div class="table-wrap" style="padding:1.8rem;">
+          <h3 style="margin-bottom:1rem;font-size:0.9rem;letter-spacing:0.1em;">Quick Message Templates</h3>
+          <div id="waTemplates"></div>
+        </div>
+        <div class="table-wrap" style="padding:1.8rem;">
+          <h3 style="margin-bottom:1rem;font-size:0.9rem;letter-spacing:0.1em;">Custom Message</h3>
+          <div class="form-field" style="margin-bottom:1rem;">
+            <label>Guest WhatsApp</label>
+            <input type="tel" id="wa-num" placeholder="+xx xxx xxx xxxx" style="background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--text);padding:0.65rem 0.9rem;font-family:'Jost',sans-serif;font-size:0.85rem;outline:none;width:100%;">
+          </div>
+          <div class="form-field" style="margin-bottom:1rem;">
+            <label>Message</label>
+            <textarea id="wa-msg" rows="6" placeholder="Type your message..." style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--text);padding:0.65rem 0.9rem;font-family:'Jost',sans-serif;font-size:0.85rem;outline:none;resize:vertical;"></textarea>
+          </div>
+          <button onclick="sendCustomWA()" style="background:#25D366;color:white;border:none;cursor:pointer;padding:0.65rem 1.5rem;font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;">💬 Send via WhatsApp</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── AUTH ──
+const ADMIN = { user: 'admin', pass: 'thehouse2024' };
+
+function doLogin() {
+  const u = document.getElementById('l-user').value;
+  const p = document.getElementById('l-pass').value;
+  if (u === ADMIN.user && p === ADMIN.pass) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appShell').style.display = 'flex';
+    initApp();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+  }
+}
+function doLogout() {
+  document.getElementById('appShell').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('l-pass').value = '';
+}
+
+// ── STATE ── (persisted in localStorage)
+function load(key, def) {
+  try { return JSON.parse(localStorage.getItem('th_'+key)) || def; } catch { return def; }
+}
+function save(key, val) { localStorage.setItem('th_'+key, JSON.stringify(val)); }
+
+let bookings = [], guests = [], properties = [], svcRequests = [];
+
+function initApp() {
+  bookings = load('bookings', []);
+  guests = load('guests', []);
+  properties = getPropertiesAdmin();
+  svcRequests = load('services', []);
+  document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-GB', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  // populate booking form property dropdown
+  const fprop = document.getElementById('f-prop');
+  if (fprop) fprop.innerHTML = properties.map(p => `<option>${p.name}</option>`).join('');
+  updateStats();
+  renderRecentBookings();
+  renderBookingsTable();
+  renderGuestsTable();
+  renderPropsTable();
+  renderSvcTable();
+  renderCalendar();
+  renderWATemplates();
+  const today = new Date().toISOString().split('T')[0];
+  document.querySelectorAll('input[type=date]').forEach(i => i.min = today);
+}
+
+// ── PAGE NAV ──
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i => {
+    if (i.getAttribute('onclick')?.includes(name)) i.classList.add('active');
+  });
+  if (name === 'calendar') renderCalendar();
+}
+
+function toggleForm(id) {
+  const f = document.getElementById(id);
+  f.classList.toggle('open');
+}
+
+// ── STATS ──
+function updateStats() {
+  const allProps = getPropertiesAdmin();
+  const thisMonth = new Date().getMonth();
+  const thisYear = new Date().getFullYear();
+  const monthBookings = bookings.filter(b => {
+    const d = new Date(b.checkIn);
+    return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+  });
+  document.getElementById('stat-bookings').textContent = monthBookings.length;
+  document.getElementById('stat-props').textContent = allProps.filter(p => p.status === 'Active').length;
+  document.getElementById('stat-pending').textContent = bookings.filter(b => b.status === 'Pending').length;
+  document.getElementById('stat-guests').textContent = guests.length;
+  const totalNights = monthBookings.reduce((s,b) => {
+    const diff = (new Date(b.checkOut) - new Date(b.checkIn)) / 86400000;
+    return s + (isNaN(diff) ? 0 : diff);
+  }, 0);
+  const occ = allProps.length ? Math.round((totalNights / (allProps.length * 30)) * 100) : 0;
+  document.getElementById('stat-occ').textContent = occ + '%';
+}
+
+// ── BOOKINGS ──
+function saveBooking() {
+  const name = document.getElementById('f-gname').value;
+  if (!name) { toast('Please enter guest name', 'coral'); return; }
+  const bk = {
+    id: Date.now(),
+    guest: name,
+    phone: document.getElementById('f-gphone').value,
+    email: document.getElementById('f-gemail').value,
+    nationality: document.getElementById('f-gnat').value,
+    property: document.getElementById('f-prop').value,
+    source: document.getElementById('f-source').value,
+    checkIn: document.getElementById('f-in').value,
+    checkOut: document.getElementById('f-out').value,
+    guestCount: document.getElementById('f-guests').value,
+    price: document.getElementById('f-price').value,
+    status: document.getElementById('f-status').value,
+    payment: document.getElementById('f-payment').value,
+    notes: document.getElementById('f-notes').value,
+    created: new Date().toISOString(),
+  };
+  bookings.unshift(bk);
+  save('bookings', bookings);
+  // Add/update guest
+  let g = guests.find(x => x.phone === bk.phone);
+  if (!g) { g = { id: Date.now(), name: bk.guest, phone: bk.phone, email: bk.email, nationality: bk.nationality, bookings: 0, spent: 0 }; guests.push(g); }
+  g.bookings = (g.bookings || 0) + 1;
+  g.spent = (g.spent || 0) + (parseFloat(bk.price) || 0);
+  save('guests', guests);
+  updateStats(); renderRecentBookings(); renderBookingsTable(); renderGuestsTable(); renderCalendar();
+  toggleForm('bookingForm');
+  toast('Booking saved! ✓');
+}
+
+function deleteBooking(id) {
+  if (!confirm('Delete this booking?')) return;
+  bookings = bookings.filter(b => b.id !== id);
+  save('bookings', bookings);
+  updateStats(); renderRecentBookings(); renderBookingsTable(); renderCalendar();
+  toast('Booking deleted');
+}
+
+function waBooking(id) {
+  const b = bookings.find(x => x.id === id);
+  if (!b) return;
+  const msg = `Hi ${b.guest}! 👋\n\nThis is *THE HOUSE* confirming your reservation:\n\n🏡 *Property:* ${b.property}\n📅 *Check-in:* ${b.checkIn}\n📅 *Check-out:* ${b.checkOut}\n👥 *Guests:* ${b.guestCount}\n💰 *Total:* $${b.price}\n📋 *Status:* ${b.status}\n\nWe look forward to welcoming you! If you have any questions, just reply here. 🌴\n\n— The House Team`;
+  window.open(`https://wa.me/${(b.phone||'').replace(/[^0-9]/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+function renderBookingRow(b, i, tbody) {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td style="color:var(--muted)">#${String(i+1).padStart(3,'0')}</td>
+    <td><strong>${b.guest}</strong><br><span style="font-size:0.7rem;color:var(--muted)">${b.phone||''}</span></td>
+    <td>${b.property}</td>
+    <td>${b.checkIn||'—'}</td>
+    <td>${b.checkOut||'—'}</td>
+    <td>${b.guestCount}</td>
+    <td>${b.price ? '$'+b.price : '—'}</td>
+    <td><span style="font-size:0.72rem;color:var(--muted)">${b.source||'Direct'}</span></td>
+    <td><span class="badge badge-${(b.status||'').toLowerCase().replace('-','').replace(' ','')}">${b.status}</span></td>
+    <td><div class="act-btns">
+      <button class="act-btn wa" onclick="waBooking(${b.id})">💬 WA</button>
+      <button class="act-btn del" onclick="deleteBooking(${b.id})">✕</button>
+    </div></td>`;
+  tbody.appendChild(tr);
+}
+
+function renderBookingsTable(filter='') {
+  const tbody = document.getElementById('bookingsBody');
+  tbody.innerHTML = '';
+  const list = filter ? bookings.filter(b => b.guest?.toLowerCase().includes(filter) || b.property?.toLowerCase().includes(filter)) : bookings;
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:2rem;">No bookings yet. Add your first booking above.</td></tr>'; return; }
+  list.forEach((b, i) => renderBookingRow(b, i, tbody));
+}
+
+function renderRecentBookings() {
+  const tbody = document.getElementById('recentBody');
+  tbody.innerHTML = '';
+  bookings.slice(0,5).forEach((b, i) => renderBookingRow(b, i, tbody));
+  if (!bookings.length) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:2rem;">No bookings yet</td></tr>';
+}
+
+function filterBookings() { renderBookingsTable(document.getElementById('bk-search').value.toLowerCase()); }
+
+function exportBookings() {
+  const headers = ['ID','Guest','Phone','Email','Property','Source','Check-In','Check-Out','Guests','Price','Status','Payment','Notes'];
+  const rows = bookings.map((b,i) => [i+1, b.guest, b.phone, b.email, b.property, b.source, b.checkIn, b.checkOut, b.guestCount, b.price, b.status, b.payment, b.notes]);
+  const csv = [headers, ...rows].map(r => r.map(x => `"${x||''}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'thehouse_bookings.csv'; a.click();
+}
+
+// ── GUESTS ──
+function renderGuestsTable(filter='') {
+  const tbody = document.getElementById('guestsBody');
+  tbody.innerHTML = '';
+  const list = filter ? guests.filter(g => g.name?.toLowerCase().includes(filter) || g.phone?.includes(filter)) : guests;
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:2rem;">No guests yet.</td></tr>'; return; }
+  list.forEach(g => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${g.name}</strong></td>
+      <td>${g.phone||'—'}</td>
+      <td>${g.email||'—'}</td>
+      <td>${g.nationality||'—'}</td>
+      <td>${g.bookings||0}</td>
+      <td>$${g.spent||0}</td>
+      <td><div class="act-btns">
+        <button class="act-btn wa" onclick="window.open('https://wa.me/${g.phone?.replace(/[^0-9]/g,'')}','_blank')">💬 WA</button>
+      </div></td>`;
+    tbody.appendChild(tr);
+  });
+}
+function filterGuests() { renderGuestsTable(document.getElementById('gs-search').value.toLowerCase()); }
+
+// ── PROPERTIES CRUD ──
+const DEFAULT_PROPERTIES = [
+  { id:1, name:"The Garden Villa",  loc:"Ahangama, Sri Lanka", guests:4, beds:2, baths:2, price:"120", badge:"Popular",  status:"Active", desc:"Lush tropical garden setting, 10 min walk to beach",  color:"#1a4040", imgUrl:"", airbnb:"", bkcom:"", fulldesc:"" },
+  { id:2, name:"The Ocean Retreat", loc:"Ahangama, Sri Lanka", guests:6, beds:3, baths:2, price:"185", badge:"Sea View", status:"Active", desc:"Panoramic ocean views, private terrace, surf access",  color:"#2d4a6e", imgUrl:"", airbnb:"", bkcom:"", fulldesc:"" },
+  { id:3, name:"The Surf Shack",    loc:"Ahangama, Sri Lanka", guests:2, beds:1, baths:1, price:"75",  badge:"Cozy",     status:"Active", desc:"Perfect for couples, steps from the surf break",      color:"#4a3d2a", imgUrl:"", airbnb:"", bkcom:"", fulldesc:"" },
+  { id:4, name:"The Jungle Nest",   loc:"Ahangama, Sri Lanka", guests:5, beds:3, baths:2, price:"155", badge:"Unique",   status:"Active", desc:"Elevated treehouse feel, jungle canopy, total privacy",color:"#1a3a1a", imgUrl:"", airbnb:"", bkcom:"", fulldesc:"" },
+  { id:5, name:"The Beach House",   loc:"Ahangama, Sri Lanka", guests:8, beds:4, baths:3, price:"245", badge:"Luxury",   status:"Active", desc:"Beachfront, infinity pool, ideal for groups & families",color:"#3a2040",imgUrl:"", airbnb:"", bkcom:"", fulldesc:"" },
+  { id:6, name:"The Hideaway",      loc:"Ahangama, Sri Lanka", guests:2, beds:1, baths:1, price:"90",  badge:"Romantic", status:"Active", desc:"Secluded retreat with private plunge pool for two",   color:"#3a1a1a", imgUrl:"", airbnb:"", bkcom:"", fulldesc:"" },
+];
+
+function getPropertiesAdmin() {
+  try {
+    const s = JSON.parse(localStorage.getItem('th_properties'));
+    return (s && s.length) ? s : DEFAULT_PROPERTIES;
+  } catch { return DEFAULT_PROPERTIES; }
+}
+function savePropertiesAdmin(arr) {
+  localStorage.setItem('th_properties', JSON.stringify(arr));
+  properties = arr; // keep in-memory sync
+}
+
+function openPropForm(id) {
+  const form = document.getElementById('propForm');
+  form.classList.add('open');
+  document.getElementById('propFormTitle').textContent = id ? 'Edit Property' : 'Add New Property';
+  if (id) {
+    const p = getPropertiesAdmin().find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('pf-id').value = p.id;
+    document.getElementById('pf-name').value = p.name;
+    document.getElementById('pf-loc').value = p.loc || 'Ahangama, Sri Lanka';
+    document.getElementById('pf-badge').value = p.badge || '';
+    document.getElementById('pf-status').value = p.status || 'Active';
+    document.getElementById('pf-guests').value = p.guests;
+    document.getElementById('pf-beds').value = p.beds;
+    document.getElementById('pf-baths').value = p.baths;
+    document.getElementById('pf-price').value = p.price;
+    document.getElementById('pf-color').value = p.color || '#1a4040';
+    document.getElementById('pf-imgurl').value = p.imgUrl || '';
+    document.getElementById('pf-airbnb').value = p.airbnb || '';
+    document.getElementById('pf-bkcom').value = p.bkcom || '';
+    document.getElementById('pf-desc').value = p.desc || '';
+    document.getElementById('pf-fulldesc').value = p.fulldesc || '';
+    previewImg(p.imgUrl || '');
+  } else {
+    document.getElementById('pf-id').value = '';
+    ['pf-name','pf-badge','pf-imgurl','pf-airbnb','pf-bkcom','pf-desc','pf-fulldesc'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('pf-loc').value = 'Ahangama, Sri Lanka';
+    document.getElementById('pf-status').value = 'Active';
+    document.getElementById('pf-guests').value = 4;
+    document.getElementById('pf-beds').value = 2;
+    document.getElementById('pf-baths').value = 1;
+    document.getElementById('pf-price').value = '';
+    document.getElementById('pf-color').value = '#1a4040';
+    document.getElementById('imgPreviewWrap').style.display = 'none';
+  }
+  form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closePropForm() {
+  document.getElementById('propForm').classList.remove('open');
+}
+
+function previewImg(url) {
+  const wrap = document.getElementById('imgPreviewWrap');
+  const img = document.getElementById('imgPreview');
+  if (url) { img.src = url; wrap.style.display = 'block'; }
+  else { wrap.style.display = 'none'; }
+}
+
+function saveProp() {
+  const name = document.getElementById('pf-name').value.trim();
+  const price = document.getElementById('pf-price').value.trim();
+  if (!name) { toast('Property name is required', 'coral'); return; }
+  if (!price) { toast('Price is required', 'coral'); return; }
+
+  const editId = document.getElementById('pf-id').value;
+  const arr = getPropertiesAdmin();
+  const propData = {
+    id: editId ? parseInt(editId) : Date.now(),
+    name,
+    loc: document.getElementById('pf-loc').value || 'Ahangama, Sri Lanka',
+    badge: document.getElementById('pf-badge').value || 'Stay',
+    status: document.getElementById('pf-status').value,
+    guests: parseInt(document.getElementById('pf-guests').value) || 2,
+    beds: parseInt(document.getElementById('pf-beds').value) || 1,
+    baths: parseInt(document.getElementById('pf-baths').value) || 1,
+    price,
+    color: document.getElementById('pf-color').value,
+    imgUrl: document.getElementById('pf-imgurl').value.trim(),
+    airbnb: document.getElementById('pf-airbnb').value.trim(),
+    bkcom: document.getElementById('pf-bkcom').value.trim(),
+    desc: document.getElementById('pf-desc').value.trim(),
+    fulldesc: document.getElementById('pf-fulldesc').value.trim(),
+  };
+
+  if (editId) {
+    const idx = arr.findIndex(x => x.id === parseInt(editId));
+    if (idx > -1) arr[idx] = propData; else arr.push(propData);
+    toast(`✓ "${name}" updated — website refreshed!`);
+  } else {
+    arr.push(propData);
+    toast(`✓ "${name}" added — now live on website!`);
+  }
+
+  savePropertiesAdmin(arr);
+  renderPropsTable();
+  updateStats();
+  closePropForm();
+}
+
+function deleteProp(id) {
+  const arr = getPropertiesAdmin();
+  const p = arr.find(x => x.id === id);
+  if (!confirm(`Delete "${p?.name}"? It will be removed from the website.`)) return;
+  savePropertiesAdmin(arr.filter(x => x.id !== id));
+  renderPropsTable();
+  updateStats();
+  toast('Property deleted');
+}
+
+function togglePropStatus(id) {
+  const arr = getPropertiesAdmin();
+  const p = arr.find(x => x.id === id);
+  if (!p) return;
+  p.status = p.status === 'Active' ? 'Inactive' : 'Active';
+  savePropertiesAdmin(arr);
+  renderPropsTable();
+  toast(`"${p.name}" is now ${p.status}`);
+}
+
+function renderPropsTable() {
+  const arr = getPropertiesAdmin();
+  const tbody = document.getElementById('propsBody');
+  const countEl = document.getElementById('propCount');
+  const active = arr.filter(p => p.status === 'Active').length;
+  if (countEl) countEl.textContent = `All Properties (${arr.length} total · ${active} live on website)`;
+  tbody.innerHTML = '';
+
+  if (!arr.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:2rem;">No properties yet. Click + Add Property to begin.</td></tr>';
+    return;
+  }
+
+  arr.forEach(p => {
+    const isActive = p.status === 'Active';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <div style="width:64px;height:48px;border-radius:0;overflow:hidden;flex-shrink:0;${p.imgUrl ? `background:url('${p.imgUrl}') center/cover` : `background:linear-gradient(135deg,${p.color||'#1a4040'},#0d1a1a)`};display:flex;align-items:center;justify-content:center;">
+          ${!p.imgUrl ? `<span style="font-size:0.6rem;color:rgba(255,255,255,0.5);">no img</span>` : ''}
+        </div>
+      </td>
+      <td>
+        <strong style="font-size:0.9rem;">${p.name}</strong><br>
+        <span style="font-size:0.7rem;color:var(--muted);">📍 ${p.loc || 'Ahangama'}</span><br>
+        <span style="font-size:0.7rem;color:var(--gold);">${p.badge || ''}</span>
+      </td>
+      <td style="font-size:0.78rem;">
+        👥 ${p.guests} guests &nbsp;·&nbsp; 🛏 ${p.beds} beds &nbsp;·&nbsp; 🚿 ${p.baths} baths<br>
+        <span style="color:var(--muted);font-size:0.72rem;">${(p.desc||'').substring(0,55)}${p.desc?.length > 55 ? '…' : ''}</span>
+      </td>
+      <td style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;">$${p.price}<span style="font-size:0.65rem;color:var(--muted);font-family:'Jost',sans-serif;">/nt</span></td>
+      <td style="font-size:0.72rem;">
+        ${p.airbnb ? `<a href="${p.airbnb}" target="_blank" style="color:var(--coral);text-decoration:none;display:block;">🏠 Airbnb ↗</a>` : '<span style="color:var(--muted)">No Airbnb link</span>'}
+        ${p.bkcom ? `<a href="${p.bkcom}" target="_blank" style="color:var(--teal);text-decoration:none;display:block;">📖 Booking.com ↗</a>` : ''}
+      </td>
+      <td>
+        <span class="badge ${isActive ? 'badge-confirmed' : 'badge-cancelled'}" style="cursor:pointer;" onclick="togglePropStatus(${p.id})" title="Click to toggle">
+          ${isActive ? '✅ Live' : '⏸ Hidden'}
+        </span>
+      </td>
+      <td>
+        <div class="act-btns" style="flex-direction:column;gap:0.4rem;">
+          <button class="act-btn" onclick="openPropForm(${p.id})" style="width:100%;text-align:center;">✏️ Edit</button>
+          <button class="act-btn" onclick="togglePropStatus(${p.id})" style="width:100%;text-align:center;">${isActive ? '⏸ Hide' : '✅ Show'}</button>
+          <button class="act-btn del" onclick="deleteProp(${p.id})" style="width:100%;text-align:center;">🗑 Delete</button>
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function previewSite() {
+  window.open('index.html', '_blank');
+}
+
+// ── SERVICES ──
+function saveSvcReq() {
+  const r = {
+    id: Date.now(),
+    name: document.getElementById('sr-name').value,
+    phone: document.getElementById('sr-phone').value,
+    type: document.getElementById('sr-type').value,
+    date: document.getElementById('sr-date').value,
+    people: document.getElementById('sr-people').value,
+    status: document.getElementById('sr-status').value,
+    notes: document.getElementById('sr-notes').value,
+  };
+  svcRequests.unshift(r);
+  save('services', svcRequests);
+  renderSvcTable();
+  toggleForm('svcReqForm');
+  toast('Service request saved! ✓');
+}
+
+function renderSvcTable() {
+  const tbody = document.getElementById('svcBody');
+  tbody.innerHTML = '';
+  if (!svcRequests.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:2rem;">No service requests yet.</td></tr>'; return; }
+  svcRequests.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${r.name}</td>
+      <td>${r.phone||'—'}</td>
+      <td>${r.type}</td>
+      <td>${r.date||'—'}</td>
+      <td>${r.people}</td>
+      <td><span class="badge badge-${r.status==='Confirmed'?'confirmed':r.status==='Completed'?'checkedin':r.status==='Cancelled'?'cancelled':'pending'}">${r.status}</span></td>
+      <td><div class="act-btns">
+        <button class="act-btn wa" onclick="window.open('https://wa.me/${(r.phone||'').replace(/[^0-9]/g,'')}','_blank')">💬 WA</button>
+        <button class="act-btn del" onclick="deleteSvc(${r.id})">✕</button>
+      </div></td>`;
+    tbody.appendChild(tr);
+  });
+}
+function deleteSvc(id) { svcRequests = svcRequests.filter(r => r.id !== id); save('services', svcRequests); renderSvcTable(); }
+
+// ── CALENDAR ──
+let calYear = new Date().getFullYear(), calMonth = new Date().getMonth();
+
+function renderCalendar() {
+  const grid = document.getElementById('calGrid');
+  const label = document.getElementById('calMonthLabel');
+  if (!grid) return;
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  label.textContent = `${monthNames[calMonth]} ${calYear}`;
+  grid.innerHTML = '';
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-day-name'; el.textContent = d;
+    grid.appendChild(el);
+  });
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  for (let i = 0; i < firstDay; i++) {
+    const el = document.createElement('div');
+    el.className = 'cal-day'; el.style.opacity = '0.3';
+    grid.appendChild(el);
+  }
+  const today = new Date();
+  for (let d = 1; d <= daysInMonth; d++) {
+    const el = document.createElement('div');
+    el.className = 'cal-day';
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    if (d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear()) el.classList.add('today');
+    el.innerHTML = `<div class="day-num">${d}</div>`;
+    const dayBookings = bookings.filter(b => {
+      const inDate = b.checkIn, outDate = b.checkOut;
+      return (inDate === dateStr || outDate === dateStr || (inDate < dateStr && outDate > dateStr));
+    });
+    dayBookings.forEach(b => {
+      const evt = document.createElement('div');
+      evt.className = b.checkIn === dateStr ? 'cal-event checkin' : b.checkOut === dateStr ? 'cal-event checkout' : 'cal-event';
+      evt.textContent = (b.checkIn === dateStr ? '▶ ' : b.checkOut === dateStr ? '◀ ' : '') + b.guest?.split(' ')[0];
+      evt.title = `${b.guest} — ${b.property}`;
+      el.appendChild(evt);
+      el.classList.add('has-booking');
+    });
+    grid.appendChild(el);
+  }
+}
+function prevMonth() { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); }
+function nextMonth() { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); }
+
+// ── WHATSAPP TEMPLATES ──
+const waTemplates = [
+  { name: 'Booking Confirmation', msg: 'Hi {name}! 🌴 Your booking at THE HOUSE has been *confirmed*.\n\n🏡 Property: {property}\n📅 Check-in: {checkin}\n📅 Check-out: {checkout}\n\nWe can\'t wait to welcome you to Ahangama! Reply here with any questions.\n— The House Team' },
+  { name: 'Check-in Reminder', msg: 'Hi {name}! 👋 Just a reminder that your check-in at *THE HOUSE* is tomorrow!\n\n📍 Address: The House, Thiththagalla Rd, Kathaluwa, Ahangama\n\nWe\'ll be there to greet you. Safe travels! 🌴' },
+  { name: 'Welcome Message', msg: 'Welcome to *THE HOUSE*, {name}! 🎉\n\nWe hope you\'re comfortable. Here are a few things:\n• 📶 WiFi: TheHouse2024\n• 🍽 Restaurant tips: Ask us anytime\n• 🏄 Surf lessons: Available daily\n• 🚗 Need a taxi? Just WhatsApp us!\n\nEnjoy your stay! 🌊' },
+  { name: 'Checkout Reminder', msg: 'Hi {name}! 🙏 Just a reminder — checkout is *tomorrow at 11am*.\n\nWe hope you had a wonderful stay at THE HOUSE! Please leave a review on Airbnb — it means the world to us. 🌟\n\nSafe travels and see you again soon! 🌴' },
+  { name: 'Review Request', msg: 'Hi {name}! Hope you had an amazing time at THE HOUSE! 🌴\n\nWould you mind leaving us a quick review on Airbnb? It helps us grow and keeps the hospitality going! 🙏\n\nhttps://airbnb.com/users/profile/about?context=host\n\nThank you so much!' },
+];
+
+function renderWATemplates() {
+  const el = document.getElementById('waTemplates');
+  if (!el) return;
+  el.innerHTML = waTemplates.map((t,i) => `
+    <div style="border:1px solid var(--border);padding:1rem;margin-bottom:0.8rem;cursor:pointer;" onclick="useTemplate(${i})">
+      <div style="font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:0.3rem;">${t.name}</div>
+      <div style="font-size:0.75rem;color:var(--muted);line-height:1.5;">${t.msg.substring(0,80)}...</div>
+      <button style="margin-top:0.6rem;background:none;border:1px solid rgba(37,211,102,0.4);color:#25D366;padding:0.3rem 0.7rem;font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;" onclick="event.stopPropagation();useTemplate(${i})">Use Template</button>
+    </div>`).join('');
+}
+function useTemplate(i) {
+  document.getElementById('wa-msg').value = waTemplates[i].msg;
+}
+function sendCustomWA() {
+  const num = document.getElementById('wa-num').value.replace(/[^0-9]/g,'');
+  const msg = document.getElementById('wa-msg').value;
+  if (!num || !msg) { toast('Enter phone number and message', 'coral'); return; }
+  window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// ── TOAST ──
+function toast(msg, type='green') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.background = type === 'coral' ? 'var(--coral)' : 'var(--green)';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
